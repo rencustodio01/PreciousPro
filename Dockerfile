@@ -17,7 +17,8 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Create SQLite database
-RUN touch /tmp/database.sqlite
+RUN mkdir -p database
+RUN touch database/database.sqlite
 
 # Set permissions
 RUN chmod -R 775 storage bootstrap/cache
