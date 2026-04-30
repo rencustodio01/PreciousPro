@@ -11,7 +11,10 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $adminRole = Role::where('role_name', 'Admin')->first();
+        $adminRole = Role::firstOrCreate(
+            ['role_name' => 'Admin'],
+            ['description' => 'Full system access']
+        );
 
         User::firstOrCreate(
             ['email' => 'admin@preciousPro.com'],
