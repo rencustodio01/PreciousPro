@@ -17,17 +17,15 @@ COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Create SQLite database
-RUN mkdir -p database
-RUN touch database/database.sqlite
+RUN mkdir -p /var/www/database \
+    && touch /var/www/database/database.sqlite
 
 # Set permissions
 RUN chmod -R 775 storage bootstrap/cache
 
-# Laravel setup
-RUN php artisan config:clear
-RUN php artisan cache:clear
-RUN php artisan migrate --force
-
 EXPOSE 10000
 
-CMD php -S 0.0.0.0:10000 -t public
+CMD php artisan config:clear && \
+    php artisan migrate --force && \
+    php artisan cache:clear && \
+    php -S 0.0.0.0:10000 -t public
