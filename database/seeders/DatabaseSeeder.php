@@ -1,9 +1,11 @@
 <?php
-// database/seeders/DatabaseSeeder.php
 
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Database\Seeders\RoleSeeder;
+use Database\Seeders\UserSeeder;
+use Database\Seeders\CategorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
