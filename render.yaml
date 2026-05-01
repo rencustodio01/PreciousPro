@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: preciouspro-web
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: LOG_LEVEL
+        value: debug
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: VITE_APP_NAME
+        value: PreciousPro
+      - key: APP_URL
+        value: https://preciouspro.onrender.com
+
+# NOTE: Do not commit secret values for DATABASE_URL or APP_KEY here.
+# Set those in the Render dashboard or use Render secrets instead.
