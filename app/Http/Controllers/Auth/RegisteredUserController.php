@@ -30,7 +30,7 @@ class RegisteredUserController extends Controller
             'password'       => [
                 'required',
                 'confirmed',
-                Rules\Password::min(8)->letters()->mixedCase()->numbers()->symbols()
+                'min:8'
             ],
         ], [
             'full_name.required'       => 'Full name is required.',
