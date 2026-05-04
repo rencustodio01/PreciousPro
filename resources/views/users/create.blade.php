@@ -11,6 +11,11 @@
 <div class="row justify-content-center">
     <div class="col-lg-8">
         <div class="form-card">
+            @if($errors->any())
+            <div class="alert-danger-custom mb-4">
+
+            </div>
+            @endif
             <form method="POST" action="{{ route('users.store') }}">
                 @csrf
                 <div class="row g-3">
