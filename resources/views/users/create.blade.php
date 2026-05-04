@@ -13,7 +13,8 @@
         <div class="form-card">
             @if($errors->any())
             <div class="alert-danger-custom mb-4">
-
+                <strong>Please fix the following errors:</strong>
+                <ul class="mb-0 mt-2">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
             </div>
             @endif
             <form method="POST" action="{{ route('users.store') }}">
