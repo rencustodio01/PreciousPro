@@ -40,6 +40,11 @@ class User extends Authenticatable
         return $this->belongsTo(Role::class);
     }
 
+    public function systemLogs()
+    {
+        return $this->hasMany(SystemLog::class);
+    }
+
     // ── Role Helpers ─────────────────────────────────────
     public function hasRole(string $role): bool
     {

@@ -11,8 +11,9 @@ use App\Http\Controllers\QualityInspectionController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SystemLogsController;
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 Route::middleware(['auth'])->group(function () {
 
@@ -52,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
     // Inventory — Admin, Inventory Officer
     Route::middleware('role:Admin,Inventory Officer')->group(function () {
         Route::post('inventory/transaction', [InventoryController::class, 'addTransaction'])
-             ->name('inventory.transaction');
+            ->name('inventory.transaction');
         Route::resource('inventory', InventoryController::class)
             ->only(['index', 'show']);
     });
@@ -61,4 +62,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('finance', FinanceRecordController::class)
         ->parameters(['finance' => 'financeRecord'])
         ->middleware('role:Admin,Finance Officer');
+
+    // System Logs
+    Route::get('systemlogs', [SystemLogsController::class, 'index'])->name('systemlogs.index');
+    Route::get('systemlogs/{systemLog}', [SystemLogsController::class, 'show'])->name('systemlogs.show');
 });
