@@ -63,6 +63,10 @@ Route::middleware(['auth'])->group(function () {
         ->parameters(['finance' => 'financeRecord'])
         ->middleware('role:Admin,Finance Officer');
 
+    Route::get('exchange-rates', [FinanceRecordController::class, 'exchangeRates'])
+        ->name('exchange.rates')
+        ->middleware('role:Admin,Finance Officer');
+
     // System Logs
     Route::get('systemlogs', [SystemLogsController::class, 'index'])->name('systemlogs.index');
     Route::get('systemlogs/{systemLog}', [SystemLogsController::class, 'show'])->name('systemlogs.show');

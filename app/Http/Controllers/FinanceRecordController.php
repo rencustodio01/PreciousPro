@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreFinanceRecordRequest;
 use App\Models\FinanceRecord;
 use App\Models\Production;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Http\JsonResponse;
 
 class FinanceRecordController extends Controller
 {
@@ -19,7 +21,9 @@ class FinanceRecordController extends Controller
             ->whereMonth('record_date', now()->month)
             ->groupBy('cost_type')->pluck('total', 'cost_type');
 
-        return view('finance.index', compact('records', 'costSummary'));
+        $exchangeCurrencies = ['PHP', 'EUR', 'JPY', 'CNY'];
+
+        return view('finance.index', compact('records', 'costSummary', 'exchangeCurrencies'));
     }
 
     public function create()
@@ -58,5 +62,66 @@ class FinanceRecordController extends Controller
     {
         $financeRecord->delete();
         return redirect()->route('finance.index')->with('success', 'Finance record deleted.');
+    }
+
+    public function exchangeRates(): JsonResponse
+    {
+        $symbols = 'PHP,EUR,JPY,CNY';
+        $accessKey = trim(env('EXCHANGERATE_API_KEY', ''));
+        $http = Http::timeout(10)
+            ->retry(2, 100)
+            ->withOptions([
+                'verify' => app()->environment('local') ? false : true,
+            ]);
+
+        try {
+            $response = $http->get('https://api.exchangerate.host/latest', array_filter([
+                'base' => 'USD',
+                'symbols' => $symbols,
+                'access_key' => $accessKey ?: null,
+            ]));
+
+            $data = $response->json();
+            if ($response->ok() && is_array($data) && array_key_exists('rates', $data)) {
+                return response()->json([
+                    'success' => true,
+                    'rates' => $data['rates'],
+                    'timestamp' => $data['timestamp'] ?? now()->timestamp,
+                ]);
+            }
+
+            logger()->warning('Primary exchange rate provider returned an invalid response.', [
+                'status' => $response->status(),
+                'body' => $response->body(),
+            ]);
+        } catch (\Throwable $e) {
+            logger()->warning('Primary exchange rate provider failed.', ['error' => $e->getMessage()]);
+        }
+
+        try {
+            $fallback = $http->get('https://open.er-api.com/v6/latest/USD');
+            $fallbackData = $fallback->json();
+
+            if ($fallback->ok() && is_array($fallbackData) && ($fallbackData['result'] ?? null) === 'success' && isset($fallbackData['rates'])) {
+                $rates = collect($fallbackData['rates'])->only(explode(',', $symbols))->toArray();
+                return response()->json([
+                    'success' => true,
+                    'rates' => $rates,
+                    'timestamp' => $fallbackData['time_last_update_unix'] ?? now()->timestamp,
+                ]);
+            }
+
+            logger()->warning('Fallback exchange rate provider returned an invalid response.', [
+                'status' => $fallback->status(),
+                'body' => $fallback->body(),
+            ]);
+        } catch (\Throwable $e) {
+            logger()->warning('Fallback exchange rate provider failed.', ['error' => $e->getMessage()]);
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Unable to fetch exchange rates at this time.',
+        ], 502);
     }
 }

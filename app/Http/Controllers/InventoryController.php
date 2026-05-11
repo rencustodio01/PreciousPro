@@ -26,15 +26,17 @@ class InventoryController extends Controller
 
     public function addTransaction(StoreStockTransactionRequest $request)
     {
-        DB::transaction(function () use ($request) {
-            $inventory = Inventory::findOrFail($request->inventory_id);
-            $qty  = $request->quantity;
-            $type = $request->transaction_type;
+        $inventory = Inventory::findOrFail($request->inventory_id);
+        $qty  = $request->quantity;
+        $type = $request->transaction_type;
 
-            if ($type === 'Stock Out' && $qty > $inventory->quantity_available) {
-                throw new \Exception('Insufficient stock. Available: ' . $inventory->quantity_available);
-            }
+        if ($type === 'Stock Out' && $qty > $inventory->quantity_available) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['quantity' => '⚠️ Insufficient stock. Available: ' . $inventory->quantity_available]);
+        }
 
+        DB::transaction(function () use ($inventory, $qty, $type, $request) {
             $type === 'Stock In'
                 ? $inventory->increment('quantity_available', $qty)
                 : $inventory->decrement('quantity_available', $qty);

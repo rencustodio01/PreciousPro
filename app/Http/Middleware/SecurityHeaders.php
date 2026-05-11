@@ -18,7 +18,7 @@ class SecurityHeaders
         $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
         $response->headers->set(
             'Content-Security-Policy',
-            "default-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;"
+            "default-src 'self' https://cdn.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com; connect-src 'self' https://api.exchangerate.host; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com;"
         );
 
         return $response;

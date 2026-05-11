@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Inventory;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreStockTransactionRequest extends FormRequest
@@ -19,5 +21,21 @@ class StoreStockTransactionRequest extends FormRequest
             'quantity'         => ['required', 'integer', 'min:1'],
             'transaction_date' => ['required', 'date'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            if ($this->transaction_type === 'Stock Out' && $this->filled('quantity')) {
+                $inventory = Inventory::find($this->inventory_id);
+
+                if ($inventory && $this->quantity > $inventory->quantity_available) {
+                    $validator->errors()->add(
+                        'quantity',
+                        '⚠️ Insufficient stock. Available: ' . $inventory->quantity_available
+                    );
+                }
+            }
+        });
     }
 }
