@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\SystemLog;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Event;
@@ -24,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
         if (config('app.env') === 'production') {
             URL::forceScheme('https');
         }
+
+        Paginator::defaultView('pagination::default');
 
         $this->registerModelObservers();
         $this->registerAuthEventLogging();

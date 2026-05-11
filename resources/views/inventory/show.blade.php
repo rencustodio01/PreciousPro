@@ -45,6 +45,12 @@
                     <th>Last Updated</th>
                     <td>{{ $inventory->last_updated->format('M d, Y H:i') }}</td>
                 </tr>
+                @if($inventory->warehouse_address)
+                <tr>
+                    <th>Warehouse</th>
+                    <td>{{ $inventory->warehouse_address }}</td>
+                </tr>
+                @endif
             </table>
         </div>
 
@@ -52,9 +58,9 @@
         <div class="form-card mt-3">
             <h5 class="mb-3">Add Stock Transaction</h5>
             @if($errors->any())
-                <div class="alert-danger-custom mb-3">
-                    @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
-                </div>
+            <div class="alert-danger-custom mb-3">
+                @foreach($errors->all() as $e)<div>{{ $e }}</div>@endforeach
+            </div>
             @endif
             <form method="POST" action="{{ route('inventory.transaction') }}">
                 @csrf
@@ -74,9 +80,14 @@
                     @error('quantity')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <div class="mb-3">
-                    <label class="form-label">Transaction Date <span class="text-danger">*</span></label>
-                    <input type="date" name="transaction_date" class="form-control @error('transaction_date') is-invalid @enderror" value="{{ old('transaction_date', now()->format('Y-m-d')) }}" required>
-                    @error('transaction_date')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                    <label class="form-label">Location From</label>
+                    <input type="text" name="location_from" class="form-control @error('location_from') is-invalid @enderror" value="{{ old('location_from') }}" placeholder="e.g., Warehouse A, Manila">
+                    @error('location_from')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Location To</label>
+                    <input type="text" name="location_to" class="form-control @error('location_to') is-invalid @enderror" value="{{ old('location_to') }}" placeholder="e.g., Store B, Cebu">
+                    @error('location_to')<div class="invalid-feedback">{{ $message }}</div>@enderror
                 </div>
                 <button type="submit" class="btn btn-gold w-100">
                     <i class="bi bi-arrow-left-right me-1"></i> Submit Transaction
@@ -99,6 +110,7 @@
                             <th>Type</th>
                             <th>Quantity</th>
                             <th>Date</th>
+                            <th>Location</th>
                             <th>Processed By</th>
                         </tr>
                     </thead>
@@ -117,11 +129,31 @@
                                 </strong>
                             </td>
                             <td>{{ $txn->transaction_date->format('M d, Y H:i') }}</td>
+                            <td>
+                                @if($txn->location_from || $txn->location_to)
+                                <small>
+                                    @if($txn->location_from)
+                                    <strong>From:</strong> {{ $txn->location_from }}<br>
+                                    @if($txn->coordinates_from)
+                                    <span class="text-muted">({{ $txn->coordinates_from }})</span><br>
+                                    @endif
+                                    @endif
+                                    @if($txn->location_to)
+                                    <strong>To:</strong> {{ $txn->location_to }}<br>
+                                    @if($txn->coordinates_to)
+                                    <span class="text-muted">({{ $txn->coordinates_to }})</span>
+                                    @endif
+                                    @endif
+                                </small>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td>{{ $txn->processor->full_name }}</td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-5 text-muted">
+                            <td colspan="6" class="text-center py-5 text-muted">
                                 <i class="bi bi-arrow-left-right" style="font-size:2rem;display:block;margin-bottom:8px;opacity:0.3"></i>
                                 No transactions yet.
                             </td>
@@ -130,7 +162,7 @@
                     </tbody>
                 </table>
             </div>
-            <div class="p-3">{{ $transactions->links() }}</div>
+            <div class="p-3 d-flex justify-content-center">{{ $transactions->links('pagination::default') }}</div>
         </div>
     </div>
 </div>

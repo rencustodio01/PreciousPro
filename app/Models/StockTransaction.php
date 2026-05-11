@@ -6,12 +6,18 @@ use Illuminate\Database\Eloquent\Model;
 
 class StockTransaction extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'inventory_id',
         'transaction_type',
         'quantity',
         'transaction_date',
         'processed_by',
+        'location_from',
+        'location_to',
+        'coordinates_from',
+        'coordinates_to',
     ];
 
     protected $casts = [

@@ -10,6 +10,9 @@ class Inventory extends Model
         'product_id',
         'quantity_available',
         'last_updated',
+        'warehouse_address',
+        'warehouse_lat',
+        'warehouse_lng',
     ];
 
     protected $casts = [

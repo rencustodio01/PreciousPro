@@ -19,7 +19,8 @@ class StoreStockTransactionRequest extends FormRequest
             'inventory_id'     => ['required', 'exists:inventories,id'],
             'transaction_type' => ['required', 'in:Stock In,Stock Out'],
             'quantity'         => ['required', 'integer', 'min:1'],
-            'transaction_date' => ['required', 'date'],
+            'location_from'    => ['nullable', 'string', 'max:255'],
+            'location_to'      => ['nullable', 'string', 'max:255'],
         ];
     }
 
